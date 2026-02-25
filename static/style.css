@@ -1,0 +1,1122 @@
+/* style.css - GitHub Pages Compatible */
+
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-image: url('background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+}
+
+/* Override Bootstrap container for game layout */
+.container {
+    padding-top: 80px; /* Space for fixed navbar */
+}
+
+/* GAME TITLE */
+.game-title {
+    font-size: 5rem;
+    font-weight: 900;
+    text-shadow: 4px 4px 10px rgba(0, 0, 0, 0.7);
+    margin-bottom: 2rem;
+    color: white;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    text-align: center;
+    width: 100%;
+}
+
+@media (max-width: 1200px) {
+    .game-title {
+        font-size: 4rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .game-title {
+        font-size: 3rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .game-title {
+        font-size: 2.5rem;
+        letter-spacing: 2px;
+    }
+}
+
+/* KIRK BOX (LEFT SIDE) */
+.kirk-box {
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 25px;
+    border: 3px solid rgba(255, 255, 255, 0.6);
+    border-left: 12px solid rgba(255, 255, 255, 0.7);
+    padding: 2rem 3rem;
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 500px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    position: relative;
+    margin: 0 auto;
+}
+
+/* Cloudy white glow effect */
+.kirk-box::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: -18px;
+    right: -6px;
+    bottom: -6px;
+    background: linear-gradient(90deg, 
+        rgba(255, 255, 255, 0.3), 
+        rgba(255, 255, 255, 0.2),
+        rgba(255, 255, 255, 0.1));
+    border-radius: 31px;
+    z-index: -1;
+    filter: blur(12px);
+    opacity: 0.8;
+}
+
+/* Left border accent */
+.kirk-box::after {
+    content: '';
+    position: absolute;
+    top: 15%;
+    left: -9px;
+    width: 10px;
+    height: 70%;
+    background: linear-gradient(to bottom, 
+        rgba(255, 255, 255, 0.9),
+        rgba(255, 255, 255, 0.7),
+        rgba(255, 255, 255, 0.5),
+        rgba(255, 255, 255, 0.7),
+        rgba(255, 255, 255, 0.9));
+    border-radius: 5px;
+    filter: blur(1px);
+}
+
+/* COUNTER */
+.counter {
+    font-size: 3.5rem !important;
+    margin-bottom: 2rem;
+    text-align: center;
+    color: #111;
+    text-shadow: 3px 3px 8px rgba(0,0,0,0.2);
+    font-weight: 900;
+    letter-spacing: 2px;
+    width: 100%;
+}
+
+/* Counter increase animation */
+@keyframes counterPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.counter-pop {
+    animation: counterPop 0.4s ease-in-out !important;
+    animation-fill-mode: both !important;
+}
+
+/* Income pulse for auto-generated Kirks */
+@keyframes incomePulse {
+    0% { 
+        color: #111;
+        text-shadow: 3px 3px 8px rgba(0,0,0,0.2);
+    }
+    50% { 
+        color: #51cf66;
+        text-shadow: 0 0 8px rgba(81, 207, 102, 0.4);
+    }
+    100% { 
+        color: #111;
+        text-shadow: 3px 3px 8px rgba(0,0,0,0.2);
+    }
+}
+
+.income-pulse {
+    animation: incomePulse 0.3s ease-in-out !important;
+    animation-fill-mode: both !important;
+}
+
+/* KPS Counter - matches existing design language */
+.kps-counter {
+    font-size: 1.5rem;
+    color: #111;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.15);
+    font-family: Arial, sans-serif;
+}
+
+.kps-label {
+    color: #111;
+    font-weight: normal;
+    opacity: 0.9;
+}
+
+#kpsValue {
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    margin-left: 0.25rem;
+}
+
+/* Pulse uses your existing incomePulse keyframes */
+.kps-counter.income-pulse {
+    animation: incomePulse 0.3s ease-in-out !important;
+    animation-fill-mode: both !important;
+}
+
+/* CLICKABLE KIRK IMAGE */
+.clickable-image {
+    width: 300px;
+    height: 300px;
+    cursor: pointer;
+    object-fit: cover;
+    border: 6px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 12px 35px rgba(0,0,0,0.6);
+    border-radius: 15px;
+    transition: all 0.2s ease;
+    display: block;
+    margin: 0 auto;
+    transform-origin: center center;
+    position: relative;
+    z-index: 1;
+}
+
+.clickable-image:hover {
+    transform: scale(1.05);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+    border-color: rgba(255, 255, 255, 0.95);
+    transition: all 0.2s ease;
+}
+
+/* Wobble animation */
+@keyframes wobble {
+    0% { 
+        transform: rotate(0deg) scale(1); 
+    }
+    15% { 
+        transform: rotate(-10deg) scale(1.1); 
+    }
+    30% { 
+        transform: rotate(8deg) scale(1.08); 
+    }
+    45% { 
+        transform: rotate(-6deg) scale(1.06); 
+    }
+    60% { 
+        transform: rotate(4deg) scale(1.04); 
+    }
+    75% { 
+        transform: rotate(-2deg) scale(1.02); 
+    }
+    90% { 
+        transform: rotate(1deg) scale(1.01); 
+    }
+    100% { 
+        transform: rotate(0deg) scale(1); 
+    }
+}
+
+.wobble {
+    animation: wobble 0.6s ease-in-out;
+    animation-fill-mode: both;
+}
+
+/* Click feedback animation */
+@keyframes clickPulse {
+    0% { 
+        box-shadow: 0 12px 35px rgba(0,0,0,0.6);
+        border-color: rgba(255, 255, 255, 0.8);
+    }
+    50% { 
+        box-shadow: 0 12px 35px rgba(255, 255, 255, 0.7), 0 0 40px rgba(255, 255, 255, 0.4);
+        border-color: rgba(255, 255, 255, 1);
+    }
+    100% { 
+        box-shadow: 0 12px 35px rgba(0,0,0,0.6);
+        border-color: rgba(255, 255, 255, 0.8);
+    }
+}
+
+.click-pulse {
+    animation: clickPulse 0.5s ease-in-out;
+    animation-fill-mode: both;
+}
+
+/* UPGRADES BOX (RIGHT SIDE) */
+.upgrades-box {
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 25px;
+    border: 3px solid rgba(255, 255, 255, 0.6);
+    border-left: 12px solid rgba(255, 255, 255, 0.7);
+    padding: 2rem;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    position: relative;
+    min-height: 500px;
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+/* Cloudy white glow effect for upgrades box */
+.upgrades-box::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: -18px;
+    right: -6px;
+    bottom: -6px;
+    background: linear-gradient(90deg, 
+        rgba(255, 255, 255, 0.3), 
+        rgba(255, 255, 255, 0.2),
+        rgba(255, 255, 255, 0.1));
+    border-radius: 31px;
+    z-index: -1;
+    filter: blur(12px);
+    opacity: 0.8;
+}
+
+/* Left border accent */
+.upgrades-box::after {
+    content: '';
+    position: absolute;
+    top: 15%;
+    left: -9px;
+    width: 10px;
+    height: 70%;
+    background: linear-gradient(to bottom, 
+        rgba(255, 255, 255, 0.9),
+        rgba(255, 255, 255, 0.7),
+        rgba(255, 255, 255, 0.5),
+        rgba(255, 255, 255, 0.7),
+        rgba(255, 255, 255, 0.9));
+    border-radius: 5px;
+    filter: blur(1px);
+}
+
+/* Custom scrollbar */
+.upgrades-box::-webkit-scrollbar {
+    width: 8px;
+}
+
+.upgrades-box::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+
+.upgrades-box::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 4px;
+}
+
+.upgrades-box::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.8);
+}
+
+/* UPGRADE ITEMS */
+.upgrade-title {
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #333;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    border-bottom: 3px solid rgba(255, 255, 255, 0.6);
+    padding-bottom: 1rem;
+}
+
+.upgrade-item {
+    background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
+    border-radius: 15px;
+    padding: 1.2rem;
+    margin-bottom: 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    opacity: 1;
+    display: block;
+}
+
+.upgrade-item.hidden {
+    display: none !important;
+}
+
+.upgrade-item.disabled {
+    opacity: 0.6;
+    background: linear-gradient(135deg, rgba(200,200,200,0.8), rgba(180,180,180,0.6));
+}
+
+.upgrade-header {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    align-items: center;
+}
+
+.upgrade-image {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,240,240,0.8));
+    border-radius: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.upgrade-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.upgrade-info {
+    flex-grow: 1;
+}
+
+.upgrade-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+    color: #222;
+}
+
+.upgrade-description {
+    font-size: 0.85rem;
+    color: #555;
+    margin-bottom: 0.8rem;
+    line-height: 1.3;
+}
+
+.upgrade-stats {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.85rem;
+}
+
+.stat {
+    font-weight: 600;
+    color: #444;
+}
+
+.upgrade-btn {
+    width: 100%;
+    padding: 0.8rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border-radius: 10px;
+    border: 3px solid rgba(255, 255, 255, 0.8);
+    background: linear-gradient(135deg, #4dabf7, #339af0);
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(51, 154, 240, 0.3);
+}
+
+.upgrade-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(51, 154, 240, 0.4);
+    background: linear-gradient(135deg, #339af0, #228be6);
+}
+
+.upgrade-btn:disabled {
+    background: linear-gradient(135deg, #adb5bd, #868e96);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Purchase glow animation */
+@keyframes purchaseGlow {
+    0% { 
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1),
+                    0 0 0 0 rgba(76, 175, 80, 0.3);
+    }
+    50% { 
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1),
+                    0 0 0 15px rgba(76, 175, 80, 0);
+    }
+    100% { 
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1),
+                    0 0 0 0 rgba(76, 175, 80, 0);
+    }
+}
+
+.purchase-glow {
+    animation: purchaseGlow 0.8s ease-in-out;
+    animation-fill-mode: both;
+}
+
+/* Upgrade reveal animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.upgrade-reveal {
+    animation: fadeInUp 0.5s ease;
+    animation-fill-mode: both;
+}
+
+/* Fade in animation */
+@keyframes unlockReveal {
+    0% { 
+        opacity: 0;
+        transform: translateY(30px) scale(0.9);
+        filter: blur(5px);
+    }
+    50% { 
+        opacity: 0.7;
+        transform: translateY(-10px) scale(1.05);
+        filter: blur(0);
+    }
+    100% { 
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
+}
+
+.unlock-reveal {
+    animation: unlockReveal 0.6s ease-in-out;
+    animation-fill-mode: both;
+}
+
+/* Hidden class */
+.hidden {
+    display: none !important;
+}
+
+/* RESPONSIVE ADJUSTMENTS */
+@media (max-width: 992px) {
+    .kirk-box, .upgrades-box {
+        padding: 1.5rem;
+    }
+    
+    .clickable-image {
+        width: 250px;
+        height: 250px;
+    }
+    
+    .counter {
+        font-size: 2.8rem !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .kirk-box, .upgrades-box {
+        min-height: 400px;
+    }
+    
+    .clickable-image {
+        width: 220px;
+        height: 220px;
+    }
+    
+    .counter {
+        font-size: 2.5rem !important;
+    }
+    
+    .upgrade-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .upgrade-stats {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .kirk-box, .upgrades-box {
+        padding: 1rem;
+        border-radius: 20px;
+    }
+    
+    .clickable-image {
+        width: 200px;
+        height: 200px;
+    }
+    
+    .counter {
+        font-size: 2.2rem !important;
+    }
+    
+    .upgrade-btn {
+        padding: 0.6rem;
+        font-size: 1rem;
+    }
+}
+/* ALPHA release text */
+.alpha-release {
+    position: fixed;
+    left: 12px;
+    bottom: 12px;
+    color: #666;
+    font-size: 1.3rem;
+    font-family: Arial, sans-serif;
+    font-weight: 600;
+    opacity: 0.95;
+    z-index: 1000;
+    pointer-events: none;
+    text-shadow: 1px 1px 3px rgb(77, 77, 77);
+}
+/* ==================== UPGRADE TAB SYSTEM ==================== */
+.upgrade-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-bottom: 0.5rem;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    color: #333;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.tab-btn.active {
+    background: linear-gradient(135deg, #4dabf7, #339af0);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 4px 15px rgba(51, 154, 240, 0.3);
+}
+
+.tab-btn:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.upgrade-tab-content {
+    display: block;
+}
+
+.upgrade-tab-content.hidden {
+    display: none;
+}
+
+/* ==================== SPECIAL UPGRADE ITEMS ==================== */
+.upgrade-item-special {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 240, 255, 0.85));
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border: 3px solid rgba(77, 171, 247, 0.4);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+.upgrade-item-special:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+.upgrade-item-tier {
+    border-color: rgba(51, 207, 102, 0.4);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 255, 240, 0.85));
+}
+
+.upgrade-special-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.upgrade-special-name {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #1864ab;
+    margin: 0;
+}
+
+.upgrade-special-level {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #495057;
+    background: rgba(255, 255, 255, 0.6);
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+}
+
+.upgrade-special-desc {
+    font-size: 0.95rem;
+    color: #495057;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+.upgrade-special-desc small {
+    display: block;
+    margin-top: 0.25rem;
+    color: #868e96;
+    font-size: 0.85rem;
+}
+
+.upgrade-progress {
+    color: #51cf66 !important;
+    font-weight: 600;
+}
+
+.upgrade-btn-special {
+    width: 100%;
+    padding: 0.9rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    border-radius: 10px;
+    border: 3px solid rgba(255, 255, 255, 0.8);
+    background: linear-gradient(135deg, #51cf66, #40c057);
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(81, 207, 102, 0.3);
+    cursor: pointer;
+}
+
+.upgrade-btn-special:hover:not(.disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(81, 207, 102, 0.4);
+    background: linear-gradient(135deg, #40c057, #37b24d);
+}
+
+.upgrade-btn-special.disabled {
+    background: linear-gradient(135deg, #adb5bd, #868e96);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* ==================== EMPTY STATE ==================== */
+.upgrade-empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: #868e96;
+}
+
+.upgrade-empty-state p {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.upgrade-empty-hint {
+    font-size: 0.9rem;
+    color: #adb5bd;
+    line-height: 1.6;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+    .upgrade-special-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .upgrade-special-level {
+        align-self: flex-start;
+    }
+    
+    .tab-btn {
+        padding: 0.6rem 0.75rem;
+        font-size: 0.9rem;
+    }
+}
+/* Add to your existing CSS */
+
+/* Individual animations */
+.clickable-image.wobble {
+    animation: wobble 0.6s ease-in-out;
+    animation-fill-mode: both;
+}
+
+.clickable-image.click-pulse {
+    animation: clickPulse 0.5s ease-in-out;
+    animation-fill-mode: both;
+}
+
+/* BOTH animations together - CRITICAL FIX */
+.clickable-image.wobble.click-pulse {
+    animation: wobble 0.6s ease-in-out, clickPulse 0.5s ease-in-out;
+    animation-fill-mode: both, both;
+}
+
+/* ==================== SOFT CLEANUP OVERRIDES ==================== */
+.container {
+    max-width: 1380px;
+    padding-top: 90px;
+}
+
+.game-title {
+    font-size: clamp(2.7rem, 7vw, 4.4rem);
+    letter-spacing: 3px;
+    margin-bottom: 1.25rem;
+}
+
+.row {
+    gap: 0.4rem 0;
+}
+
+.kirk-box,
+.upgrades-box {
+    border-radius: 18px;
+    padding: 1.5rem 1.6rem;
+    border-width: 2px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.26);
+}
+
+.kirk-box {
+    min-height: 480px;
+}
+
+.counter {
+    font-size: clamp(2.3rem, 5vw, 3.3rem) !important;
+    margin-bottom: 1rem;
+}
+
+.kps-counter {
+    margin-bottom: 1rem;
+    font-size: 1.35rem;
+}
+
+.clickable-image {
+    width: min(320px, 88%);
+    height: auto;
+    aspect-ratio: 1 / 1;
+    border-radius: 14px;
+}
+
+.upgrade-title {
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.7rem;
+}
+
+.upgrade-item,
+.upgrade-item-special {
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 0.8rem;
+}
+
+.upgrade-header {
+    margin-bottom: 0.75rem;
+}
+
+.upgrade-image {
+    width: 58px;
+    height: 58px;
+}
+
+.upgrade-name {
+    font-size: 1.05rem;
+}
+
+.upgrade-description {
+    font-size: 0.82rem;
+    margin-bottom: 0.55rem;
+}
+
+.upgrade-stats {
+    gap: 0.9rem;
+    font-size: 0.8rem;
+}
+
+.upgrade-btn,
+.upgrade-btn-special {
+    border-radius: 10px;
+    padding: 0.72rem;
+    font-size: 1rem;
+}
+
+.upgrade-tabs {
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.4rem;
+}
+
+.tab-btn {
+    border-radius: 9px;
+    font-size: 0.92rem;
+    padding: 0.62rem 0.75rem;
+}
+
+.alpha-release {
+    font-size: 1rem;
+    opacity: 0.82;
+}
+
+.jumpscare-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: transparent;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.jumpscare-overlay.active {
+    display: flex;
+}
+
+.jumpscare-image {
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+}
+
+.top-panel-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 120000;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.top-panel-window {
+    width: min(760px, 95vw);
+    max-height: 88vh;
+    overflow-y: auto;
+    background: rgba(255, 255, 255, 0.96);
+    border: 2px solid rgba(255, 255, 255, 0.75);
+    border-radius: 14px;
+    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.45);
+    padding: 1rem 1.1rem;
+}
+
+.top-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.8rem;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.12);
+    padding-bottom: 0.55rem;
+}
+
+.top-panel-title {
+    margin: 0;
+    color: #222;
+    font-size: 1.35rem;
+}
+
+.top-panel-close {
+    border: 1px solid #333;
+    background: #f4f4f4;
+    color: #111;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    padding: 0.35rem 0.6rem;
+    cursor: pointer;
+}
+
+.top-panel-view {
+    color: #1d1d1d;
+}
+
+.settings-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.7rem;
+}
+
+.top-panel-action {
+    border: 1px solid #2f2f2f;
+    background: #f7f7f7;
+    color: #121212;
+    border-radius: 10px;
+    padding: 0.7rem 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.top-panel-action:hover {
+    background: #ededed;
+}
+
+.top-panel-danger {
+    border-color: #c0392b;
+    color: #b11f10;
+}
+
+.stats-list {
+    display: grid;
+    gap: 0.55rem;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    padding: 0.55rem 0.7rem;
+}
+
+.stat-row strong {
+    font-variant-numeric: tabular-nums;
+}
+
+.update-log h4 {
+    margin-bottom: 0.55rem;
+}
+
+.update-log ul {
+    margin-left: 1rem;
+    line-height: 1.45;
+}
+
+.skins-coming-soon {
+    text-align: center;
+    padding: 1.3rem 0.4rem 1rem;
+}
+
+.skins-qmark {
+    font-size: 4.2rem;
+    font-weight: 900;
+    line-height: 1;
+    color: #222;
+    margin-bottom: 0.4rem;
+}
+
+@media (max-width: 640px) {
+    .settings-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.white-monster {
+    position: fixed;
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    z-index: 90000;
+    cursor: pointer;
+    user-select: none;
+    filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.5));
+    transform-origin: center center;
+    animation: monsterWiggle 0.7s ease-in-out infinite;
+}
+
+@keyframes monsterWiggle {
+    0% { transform: rotate(0deg) scale(1); }
+    20% { transform: rotate(-8deg) scale(1.04); }
+    40% { transform: rotate(8deg) scale(1.04); }
+    60% { transform: rotate(-6deg) scale(1.02); }
+    80% { transform: rotate(6deg) scale(1.02); }
+    100% { transform: rotate(0deg) scale(1); }
+}
+
+/* Two dedicated system squares: Auto-clickers + Upgrades */
+.systems-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.1rem;
+}
+
+.square-panel {
+    aspect-ratio: auto;
+    min-height: 500px;
+    max-height: 600px;
+    display: flex;
+    flex-direction: column;
+}
+
+.square-panel #upgradesContainer,
+.square-panel #upgradeTabContent {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 0.2rem;
+}
+
+@media (min-width: 993px) {
+    .kirk-col {
+        flex: 0 0 40% !important;
+        max-width: 40% !important;
+    }
+
+    .systems-col {
+        flex: 0 0 60% !important;
+        max-width: 60% !important;
+    }
+}
+
+@media (max-width: 992px) {
+    .container {
+        padding-top: 86px;
+    }
+
+    .kirk-box,
+    .upgrades-box {
+        padding: 1.25rem;
+        min-height: auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .game-title {
+        letter-spacing: 2px;
+    }
+
+    .kps-counter {
+        font-size: 1.15rem;
+    }
+
+    .upgrade-stats {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .square-panel {
+        aspect-ratio: auto;
+        min-height: 400px;
+        max-height: 520px;
+    }
+
+    .systems-grid {
+        grid-template-columns: 1fr;
+    }
+}
