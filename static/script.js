@@ -341,6 +341,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!elements.kpsValue || !elements.kpsCounter) return;
         
         const incomePerSecond = calculateIncomePerSecond();
+        const now = Date.now();
         
         const valueChanged = lastDisplayedKPS === null || 
                             Math.abs(incomePerSecond - lastDisplayedKPS) > KPS_EPSILON;
@@ -1602,6 +1603,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     init();
 });
+
 
 
 
