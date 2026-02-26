@@ -845,6 +845,7 @@ document.addEventListener("DOMContentLoaded", () => {
             totalKirksMade: gameState.totalKirksMade,
             handClickedKirks: gameState.handClickedKirks,
             totalPlaytimeMs: gameState.totalPlaytimeMs,
+            runStartedAt: runStartedAt,
             clickerTierById: gameState.clickerTierById,
             upgrades: gameState.upgrades.map(upgrade => ({
                 id: upgrade.id,
@@ -890,6 +891,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         totalKirksMade: v2Data.kirks || 0,
                         handClickedKirks: 0,
                         totalPlaytimeMs: 0,
+                        runStartedAt: Date.now(),
                         clickerTierById: {},
                         upgrades: v2Data.upgrades || []
                     };
@@ -926,6 +928,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function applySave(saveData) {
         if (!saveData) return;
         const firstClickerId = gameState.upgrades[0] ? gameState.upgrades[0].id : null;
+        const now = Date.now();
         
         gameState.kirks = Number.isFinite(saveData.kirks) ? saveData.kirks : 0;
         gameState.totalClicks = Number.isFinite(saveData.totalClicks) ? saveData.totalClicks : 0;
@@ -935,6 +938,10 @@ document.addEventListener("DOMContentLoaded", () => {
         gameState.totalKirksMade = Number.isFinite(saveData.totalKirksMade) ? Math.max(0, saveData.totalKirksMade) : Math.max(0, gameState.kirks);
         gameState.handClickedKirks = Number.isFinite(saveData.handClickedKirks) ? Math.max(0, saveData.handClickedKirks) : 0;
         gameState.totalPlaytimeMs = Number.isFinite(saveData.totalPlaytimeMs) ? Math.max(0, saveData.totalPlaytimeMs) : 0;
+        runStartedAt = Number.isFinite(saveData.runStartedAt)
+            ? Math.min(now, Math.max(0, saveData.runStartedAt))
+            : now;
+        lastLoopAt = now;
         
         // Load clicker tiers
         if (saveData.clickerTierById && typeof saveData.clickerTierById === 'object') {
@@ -1534,6 +1541,18 @@ document.addEventListener("DOMContentLoaded", () => {
     if (elements.btnReset) {
         elements.btnReset.addEventListener('click', resetGame);
     }
+
+    function saveSessionState() {
+        saveToLocalStorage();
+    }
+
+    window.addEventListener('beforeunload', saveSessionState);
+    window.addEventListener('pagehide', saveSessionState);
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+            saveSessionState();
+        }
+    });
     
     // ==================== GAME LOOP ====================
     function gameLoop() {
@@ -1582,6 +1601,10 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
             console.log('Starting fresh game');
         }
+
+        // Persist migrated/new metadata immediately (e.g., runStartedAt)
+        saveToLocalStorage();
+        lastAutoSave = Date.now();
         
         renderUpgrades();
         renderUpgradeTab();
@@ -1603,3 +1626,4 @@ document.addEventListener("DOMContentLoaded", () => {
     
     init();
 });
+
