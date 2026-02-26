@@ -180,10 +180,10 @@ document.addEventListener("DOMContentLoaded", () => {
             const indexInPhase = Math.max(0, upgradeIndex - phase.start);
 
             if (phaseIndex === 0) return CLICKER_PHASE1_MULTIPLIER; // Phase 1: 6x
-            if (phaseIndex === 1) return CLICKER_PHASE1_MULTIPLIER + 0.5; // Phase 2: 6.5x
-            if (phaseIndex === 2) return CLICKER_PHASE1_MULTIPLIER + 1; // Phase 3: 7x
-            if (phaseIndex === 3) return CLICKER_PHASE1_MULTIPLIER + 1.5 + indexInPhase; // Phase 4: 7.5x, 8.5x, 9.5x...
-            return CLICKER_PHASE1_MULTIPLIER + 2 + (indexInPhase * 2); // Phase 5: 8x, 10x, 12x...
+            if (phaseIndex === 1) return CLICKER_PHASE1_MULTIPLIER + 1; // Phase 2: 7x
+            if (phaseIndex === 2) return CLICKER_PHASE1_MULTIPLIER + 2; // Phase 3: 8x
+            if (phaseIndex === 3) return CLICKER_PHASE1_MULTIPLIER + 3 + indexInPhase; // Phase 4: 9x, 10x, 11x...
+            return CLICKER_PHASE1_MULTIPLIER + 4 + (indexInPhase * 2); // Phase 5: 10x, 12x, 14x...
         }
 
         let runningCost = CLICKER_BASE_COST;
@@ -1623,6 +1623,8 @@ document.addEventListener("DOMContentLoaded", () => {
     
     init();
 });
+
+
 
 
 

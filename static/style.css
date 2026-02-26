@@ -1026,6 +1026,20 @@ body {
     margin-bottom: 0.55rem;
 }
 
+.info-discord-link {
+    margin-bottom: 0.65rem;
+}
+
+.info-discord-link a {
+    color: #1864ab;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.info-discord-link a:hover {
+    text-decoration: underline;
+}
+
 .update-log ul {
     margin-left: 1rem;
     line-height: 1.45;
@@ -1143,6 +1157,7 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
 
 
 
