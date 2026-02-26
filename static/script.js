@@ -8,6 +8,9 @@ document.addEventListener("DOMContentLoaded", () => {
         kpsCounter: document.getElementById('kpsCounter'),
         kpsValue: document.getElementById('kpsValue'),
         upgradesContainer: document.getElementById('upgradesContainer'),
+        upgradeTabContent: document.getElementById('upgradeTabContent'),
+        upgradeClickCount: document.getElementById('upgradeClickCount'),
+        upgradeClickNext: document.getElementById('upgradeClickNext'),
         authStatus: document.getElementById('authStatus'),
         btnSave: document.getElementById('btnSave'),
         btnLoad: document.getElementById('btnLoad'),
@@ -149,7 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const CLICKER_BASE_COST = 50;
     const CLICKER_BASE_PER_SEC = 0.5;
     const CLICKER_PHASE1_MULTIPLIER = 6;
-    const UPGRADE_COMMON_MULTIPLIER = 4;
+    const UPGRADE_COMMON_MULTIPLIER = 4.2;
     const GENERAL_UPGRADE_BASE_COST = 5000;
     const MANUAL_UPGRADE_BASE_COST = 2000;
     const CLICKER_TIER_UPGRADE_BASE_FACTOR = 2;
@@ -226,7 +229,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // Auto-save tracking
     let lastAutoSave = Date.now();
-    let originalStatusText = 'Save System Active';
+    let originalStatusText = '';
     let runStartedAt = Date.now();
     let lastLoopAt = Date.now();
     
@@ -736,17 +739,17 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // General upgrade cost: 5,000 * (4^level)
+    // General upgrade cost: base * (UPGRADE_COMMON_MULTIPLIER^level)
     function getGeneralUpgradeCost() {
         return getScaledUpgradeCost(GENERAL_UPGRADE_BASE_COST, gameState.generalLevel);
     }
     
-    // Manual upgrade cost: 2,000 * (4^level)
+    // Manual upgrade cost: base * (UPGRADE_COMMON_MULTIPLIER^level)
     function getManualUpgradeCost() {
         return getScaledUpgradeCost(MANUAL_UPGRADE_BASE_COST, gameState.manualLevel);
     }
     
-    // Clicker tier cost: (baseCost * 2) * (4^tier)
+    // Clicker tier cost: (baseCost * CLICKER_TIER_UPGRADE_BASE_FACTOR) scaled by common multiplier
     function getClickerTierCost(clickerId) {
         const cached = upgradeMap.get(clickerId);
         if (!cached) return Infinity;
@@ -762,9 +765,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const cached = upgradeMap.get(clickerId);
         if (!cached) return nextTier * 50;
 
-        // First 10 clickers: first tier at 25, then 50/100/150...
-        if (cached.index < EARLY_CLICKER_COUNT && nextTier === 1) {
-            return 25;
+        // First 10 clickers: tiers unlock at 25, 50, 100, 150...
+        if (cached.index < EARLY_CLICKER_COUNT) {
+            if (nextTier === 1) return 25;
+            if (nextTier === 2) return 50;
+            return (nextTier - 1) * 50;
         }
 
         return nextTier * 50;
@@ -1123,14 +1128,31 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
     
+    function updateUpgradeClickFooter() {
+        if (!elements.upgradeClickCount || !elements.upgradeClickNext) return;
+
+        const totalClicks = gameState.totalClicks;
+        const nextManualRequirement = (gameState.manualLevel + 1) * 1000;
+
+        elements.upgradeClickCount.textContent = formatNumber(totalClicks);
+
+        if (totalClicks >= nextManualRequirement) {
+            elements.upgradeClickNext.textContent = 'Manual upgrade unlocked (' + formatNumber(nextManualRequirement) + ' clicks)';
+        } else {
+            elements.upgradeClickNext.textContent = 'Next Manual at ' + formatNumber(nextManualRequirement) + ' (' + formatNumber(totalClicks) + ' / ' + formatNumber(nextManualRequirement) + ')';
+        }
+    }
+
     // ==================== GAME FUNCTIONS ====================
     
     function updateCounterOnly() {
         if (elements.counter) {
             elements.counter.textContent = `${formatNumber(gameState.kirks)} Kirks`;
         }
+
+        updateUpgradeClickFooter();
     }
-    
+
     function updateButtonStates() {
         // Auto-clicker buttons
         domCache.buttons.forEach((button, upgradeId) => {
@@ -1419,14 +1441,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     <p>No upgrades available yet.</p>
                     <p class="upgrade-empty-hint">
                         ${gameState.generalLevel >= gameState.maxGeneralUnlocked ? 
-                            'Buy more clickers to unlock phases and General upgrades!' : ''}
-                        ${!isManualUpgradeAvailable() ? 
-                            `<br>Next Manual upgrade at ${formatNumber((gameState.manualLevel + 1) * 1000)} clicks (${formatNumber(gameState.totalClicks)} / ${formatNumber((gameState.manualLevel + 1) * 1000)})` : ''}
+                            "Buy more clickers to unlock phases and General upgrades!" : "Keep clicking and buying to unlock more upgrades!"}
                     </p>
                 </div>
             `;
         }
-        
+
         needsUpgradeTabRender = false;
     }
     
@@ -1603,6 +1623,12 @@ document.addEventListener("DOMContentLoaded", () => {
     
     init();
 });
+
+
+
+
+
+
 
 
 

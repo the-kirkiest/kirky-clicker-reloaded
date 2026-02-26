@@ -633,6 +633,29 @@ body {
     display: none;
 }
 
+
+
+.upgrade-click-footer {
+    margin-top: 0.75rem;
+    padding: 0.65rem 0.8rem;
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.08);
+    text-align: center;
+}
+
+.upgrade-click-footer-main {
+    color: #1f2937;
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.upgrade-click-footer-sub {
+    color: #374151;
+    font-size: 0.8rem;
+    margin-top: 0.2rem;
+}
+
 /* ==================== SPECIAL UPGRADE ITEMS ==================== */
 .upgrade-item-special {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 240, 255, 0.85));
@@ -1120,3 +1143,7 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+
+
+

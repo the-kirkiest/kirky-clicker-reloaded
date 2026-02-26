@@ -127,7 +127,7 @@
         <button class="top-action-btn" type="button" data-panel="info">Info</button>
         <button class="top-action-btn" type="button" data-panel="skins">Skins</button>
     </div>
-    <div id="authStatus" class="top-status">Save System Active</div>
+    <div id="authStatus" class="top-status"></div>
 
     <div id="topPanelOverlay" class="top-panel-overlay hidden">
         <div class="top-panel-window">
@@ -210,6 +210,10 @@
                         <div id="upgradeTabContent" class="upgrade-tab-content">
                             <!-- Upgrade cards will be inserted here by JavaScript -->
                         </div>
+                        <div id="upgradeClickFooter" class="upgrade-click-footer">
+                            <div class="upgrade-click-footer-main">Clicks: <span id="upgradeClickCount">0</span></div>
+                            <div id="upgradeClickNext" class="upgrade-click-footer-sub">Next Manual at 1K (0 / 1K)</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -237,3 +241,5 @@
     <div class="alpha-release">ALPHA RELEASE 1.4</div>
 </body>
 </html>
+
+
