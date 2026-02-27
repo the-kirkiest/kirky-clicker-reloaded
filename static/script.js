@@ -152,11 +152,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const CLICKER_BASE_COST = 50;
     const CLICKER_BASE_PER_SEC = 0.5;
     const CLICKER_PHASE1_MULTIPLIER = 6;
+    const CLICKER_CPS_STEP_FACTOR = 0.82;
+    const CLICKER_COST_MULTIPLIER = 1.18;
     const UPGRADE_COMMON_MULTIPLIER = 4.2;
     const GENERAL_UPGRADE_BASE_COST = 5000;
+    const GENERAL_MULTIPLIER_PER_LEVEL = 1.08;
     const MANUAL_UPGRADE_BASE_COST = 2000;
     const CLICKER_TIER_UPGRADE_BASE_FACTOR = 2;
+    const CLICKER_TIER_MULTIPLIER = 1.5;
     const EARLY_CLICKER_COUNT = 10;
+    const NEXT_UNLOCK_PREVIEW_OWNED = 5;
+    const NEXT_UNLOCK_OWNED = 10;
+    const PRE_REBIRTH_SOFTCAP_START = 1000000;
+    const PRE_REBIRTH_SOFTCAP_EXPONENT = 0.72;
 
     function formatPerSecondForDesc(value) {
         if (Math.abs(value) >= 1000) return formatNumber(value);
@@ -192,19 +200,22 @@ document.addEventListener("DOMContentLoaded", () => {
         gameState.upgrades.forEach((upgrade, index) => {
             if (index > 0) {
                 const stepMultiplier = getStepMultiplier(index);
+                const cpsStepMultiplier = Math.max(1.05, stepMultiplier * CLICKER_CPS_STEP_FACTOR);
                 runningCost = Math.round(runningCost * stepMultiplier);
-                runningPerSec = runningPerSec * stepMultiplier;
+                runningPerSec = runningPerSec * cpsStepMultiplier;
             }
 
             upgrade.baseCost = runningCost;
             upgrade.perSec = runningPerSec;
             upgrade.cost = runningCost;
+            upgrade.costMult = CLICKER_COST_MULTIPLIER;
             upgrade.desc = `Generates ${formatPerSecondForDesc(upgrade.perSec)} Kirks/sec`;
             upgrade.unlocked = (index === 0);
         });
     }
 
     rebalanceClickerTiers();
+    recomputeUpgradeUnlockStates();
     
     // Initialize clickerTierById for all clickers
     gameState.upgrades.forEach(clicker => {
@@ -249,9 +260,9 @@ document.addEventListener("DOMContentLoaded", () => {
     let jumpscareTimeout = null;
     let jumpscareActive = false;
     let jumpscareHasPlayed = false;
-    const MONSTER_CHANCE_DENOMINATOR = 750;
-    const MONSTER_BOOST_MULTIPLIER = 6.7;
-    const MONSTER_BOOST_DURATION_MS = 67000;
+    const MONSTER_CHANCE_DENOMINATOR = 1800;
+    const MONSTER_BOOST_MULTIPLIER = 2.2;
+    const MONSTER_BOOST_DURATION_MS = 20000;
     const MONSTER_IMAGE_SRC = 'static/460-4605622_transparent-monster-energy-can-png-white-monster-energy.png';
     const AGARTHAN_KIRK_SRC = 'static/agarthan kirk.jpg';
     const AGARTHA_BG_SRC = 'static/agartha.jpg';
@@ -387,12 +398,42 @@ document.addEventListener("DOMContentLoaded", () => {
             upgradeMap.set(upgrade.id, { upgrade, index });
         });
     }
+
+    function getUpgradeVisibilityState(index) {
+        if (index === 0) return 'unlocked';
+
+        const upgrade = gameState.upgrades[index];
+        if (upgrade && upgrade.owned > 0) return 'unlocked';
+
+        const previousUpgrade = gameState.upgrades[index - 1];
+        if (!previousUpgrade) return 'hidden';
+
+        if (previousUpgrade.owned >= NEXT_UNLOCK_OWNED) return 'unlocked';
+        if (previousUpgrade.owned >= NEXT_UNLOCK_PREVIEW_OWNED) return 'preview';
+        return 'hidden';
+    }
+
+    function isUpgradeFullyUnlocked(index) {
+        return getUpgradeVisibilityState(index) === 'unlocked';
+    }
+
+    function recomputeUpgradeUnlockStates() {
+        gameState.upgrades.forEach((upgrade, index) => {
+            upgrade.unlocked = isUpgradeFullyUnlocked(index);
+        });
+    }
+
+    function applyPreRebirthSoftcap(rawIncomePerSecond) {
+        if (rawIncomePerSecond <= PRE_REBIRTH_SOFTCAP_START) return rawIncomePerSecond;
+        const overflow = rawIncomePerSecond - PRE_REBIRTH_SOFTCAP_START;
+        return PRE_REBIRTH_SOFTCAP_START + Math.pow(overflow, PRE_REBIRTH_SOFTCAP_EXPONENT);
+    }
     
     // ==================== MULTIPLIER CALCULATIONS ====================
     
-    // General multiplier: 1.3^generalLevel
+    // General multiplier: GENERAL_MULTIPLIER_PER_LEVEL^generalLevel
     function getGeneralMultiplier() {
-        return Math.pow(1.3, gameState.generalLevel);
+        return Math.pow(GENERAL_MULTIPLIER_PER_LEVEL, gameState.generalLevel);
     }
     
     // Manual click value: baseClick * (2^manualLevel) * generalMultiplier
@@ -486,14 +527,14 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
     
-    // Clicker production: owned * perSec * (2^tier) * generalMultiplier
+    // Clicker production: owned * perSec * (tier multiplier) * generalMultiplier
     function getClickerProduction(clickerId) {
         const cached = upgradeMap.get(clickerId);
         if (!cached) return 0;
         
         const clicker = cached.upgrade;
         const tier = gameState.clickerTierById[clickerId] || 0;
-        const tierMultiplier = Math.pow(2, tier);
+        const tierMultiplier = Math.pow(CLICKER_TIER_MULTIPLIER, tier);
         
         return clicker.owned * clicker.perSec * tierMultiplier * getGeneralMultiplier() * getMonsterBoostMultiplier();
     }
@@ -504,7 +545,7 @@ document.addEventListener("DOMContentLoaded", () => {
         gameState.upgrades.forEach(clicker => {
             total += getClickerProduction(clicker.id);
         });
-        return total;
+        return applyPreRebirthSoftcap(total);
     }
     
     // ==================== UPGRADE COST CALCULATIONS ====================
@@ -602,7 +643,7 @@ document.addEventListener("DOMContentLoaded", () => {
         applyAgarthaVisuals();
         updateAllProductionDisplays();
         updateKPS(true);
-        showStatusMessage('Agartha Boost x6.7 (67s)', 1800);
+        showStatusMessage(`Agartha Boost x${MONSTER_BOOST_MULTIPLIER.toFixed(1)} (${Math.round(MONSTER_BOOST_DURATION_MS / 1000)}s)`, 1800);
 
         boostTimeout = setTimeout(endMonsterBoost, MONSTER_BOOST_DURATION_MS);
     }
@@ -749,14 +790,14 @@ document.addEventListener("DOMContentLoaded", () => {
         return getScaledUpgradeCost(MANUAL_UPGRADE_BASE_COST, gameState.manualLevel);
     }
     
-    // Clicker tier cost: (baseCost * CLICKER_TIER_UPGRADE_BASE_FACTOR) scaled by common multiplier
+    // Clicker tier cost: based on current building cost (not static base) and scaled by common multiplier
     function getClickerTierCost(clickerId) {
         const cached = upgradeMap.get(clickerId);
         if (!cached) return Infinity;
         
         const clicker = cached.upgrade;
         const tier = gameState.clickerTierById[clickerId] || 0;
-        const tierBaseCost = clicker.baseCost * CLICKER_TIER_UPGRADE_BASE_FACTOR;
+        const tierBaseCost = clicker.cost * CLICKER_TIER_UPGRADE_BASE_FACTOR;
 
         return getScaledUpgradeCost(tierBaseCost, tier + 1);
     }
@@ -792,8 +833,8 @@ document.addEventListener("DOMContentLoaded", () => {
     function getAvailableClickerTierUpgrades() {
         const available = [];
         
-        gameState.upgrades.forEach(clicker => {
-            if (!clicker.unlocked) return;
+        gameState.upgrades.forEach((clicker, index) => {
+            if (!isUpgradeFullyUnlocked(index)) return;
             
             const tier = gameState.clickerTierById[clicker.id] || 0;
             const requiredOwned = getClickerTierRequiredOwned(clicker.id, tier + 1);
@@ -965,7 +1006,7 @@ document.addEventListener("DOMContentLoaded", () => {
         gameState.upgrades.forEach(upgrade => {
             upgrade.owned = 0;
             upgrade.cost = upgrade.baseCost;
-            upgrade.unlocked = (upgrade.id === gameState.upgrades[0].id);
+            upgrade.unlocked = false;
         });
         
         // Apply saved upgrades
@@ -986,20 +1027,11 @@ document.addEventListener("DOMContentLoaded", () => {
                         upgrade.baseCost,
                         Math.floor(upgrade.baseCost * Math.pow(upgrade.costMult, upgrade.owned))
                     );
-                    
-                    if (upgrade.owned > 0) {
-                        upgrade.unlocked = true;
-                    }
                 }
             });
-            
-            // Unlock next upgrades based on ownership
-            for (let i = 0; i < gameState.upgrades.length - 1; i++) {
-                if (gameState.upgrades[i].owned > 0) {
-                    gameState.upgrades[i + 1].unlocked = true;
-                }
-            }
         }
+
+        recomputeUpgradeUnlockStates();
         
         // Update phase-based unlocks
         updateMaxGeneralUnlocked();
@@ -1114,9 +1146,10 @@ document.addEventListener("DOMContentLoaded", () => {
             gameState.upgrades.forEach(upgrade => {
                 upgrade.owned = 0;
                 upgrade.cost = upgrade.baseCost;
-                upgrade.unlocked = (upgrade.id === gameState.upgrades[0].id);
+                upgrade.unlocked = false;
                 gameState.clickerTierById[upgrade.id] = 0;
             });
+            recomputeUpgradeUnlockStates();
             
             initUpgradeMap();
             needsRender = true;
@@ -1162,8 +1195,10 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!cached) return;
             
             const { upgrade } = cached;
+            const isUnlocked = isUpgradeFullyUnlocked(cached.index);
+            upgrade.unlocked = isUnlocked;
             const canBuy = gameState.freeMode || gameState.kirks >= upgrade.cost;
-            const isDisabled = !canBuy || !upgrade.unlocked;
+            const isDisabled = !canBuy || !isUnlocked;
             
             button.disabled = isDisabled;
         });
@@ -1180,10 +1215,44 @@ document.addEventListener("DOMContentLoaded", () => {
         domCache.prodSpans.clear();
         
         gameState.upgrades.forEach((upgrade, index) => {
+            const visibilityState = getUpgradeVisibilityState(index);
+            if (visibilityState === 'hidden') {
+                upgrade.unlocked = false;
+                return;
+            }
+
+            const isPreview = visibilityState === 'preview';
+            upgrade.unlocked = !isPreview;
+
             const upgradeEl = document.createElement('div');
-            upgradeEl.className = `upgrade-item ${upgrade.unlocked ? '' : 'hidden'}`;
+            upgradeEl.className = `upgrade-item ${isPreview ? 'upgrade-item-preview' : ''}`;
             upgradeEl.dataset.upgradeId = upgrade.id;
-            
+
+            if (isPreview) {
+                const previousUpgrade = gameState.upgrades[index - 1];
+                const revealProgress = previousUpgrade ? Math.min(previousUpgrade.owned, NEXT_UNLOCK_OWNED) : 0;
+                upgradeEl.innerHTML = `
+                    <div class="upgrade-header">
+                        <div class="upgrade-image">
+                            <div class="placeholder-text mystery">?</div>
+                        </div>
+                        <div class="upgrade-info">
+                            <h4 class="upgrade-name">Unknown Auto-Clicker</h4>
+                            <p class="upgrade-description">A new unit is close. Keep pushing to reveal it.</p>
+                            <div class="upgrade-stats">
+                                <span class="stat">Owned: ???</span>
+                                <span class="stat">Production: ???/sec</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn upgrade-btn" disabled>
+                        Locked (<span class="upgrade-mystery-progress">${revealProgress}</span> / ${NEXT_UNLOCK_OWNED})
+                    </button>
+                `;
+                elements.upgradesContainer.appendChild(upgradeEl);
+                return;
+            }
+
             const imgTag = upgrade.image ? 
                 `<img src="${upgrade.image}" alt="${upgrade.name}" loading="lazy">` : 
                 `<div class="placeholder-text">${upgrade.id.toUpperCase()}</div>`;
@@ -1269,9 +1338,11 @@ document.addEventListener("DOMContentLoaded", () => {
     
     function buyUpgrade(index) {
         const upgrade = gameState.upgrades[index];
-        
-        if (!upgrade.unlocked) return;
+        if (!upgrade) return;
+        if (!isUpgradeFullyUnlocked(index)) return;
         if (!gameState.freeMode && gameState.kirks < upgrade.cost) return;
+
+        const previousNextVisibility = index < gameState.upgrades.length - 1 ? getUpgradeVisibilityState(index + 1) : null;
         
         if (!gameState.freeMode) {
             gameState.kirks -= upgrade.cost;
@@ -1279,10 +1350,12 @@ document.addEventListener("DOMContentLoaded", () => {
         
         upgrade.owned += 1;
         upgrade.cost = Math.floor(upgrade.cost * upgrade.costMult);
-        
-        const willUnlock = (upgrade.owned === 1 && index < gameState.upgrades.length - 1);
-        
-        if (!willUnlock) {
+
+        recomputeUpgradeUnlockStates();
+        const nextVisibility = index < gameState.upgrades.length - 1 ? getUpgradeVisibilityState(index + 1) : null;
+        const visibilityChanged = previousNextVisibility !== nextVisibility;
+
+        if (!visibilityChanged) {
             const countSpan = domCache.countSpans.get(upgrade.id);
             const costSpan = domCache.costSpans.get(upgrade.id);
             const prodSpan = domCache.prodSpans.get(upgrade.id);
@@ -1292,8 +1365,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (prodSpan) prodSpan.textContent = formatNumber(getClickerProduction(upgrade.id));
         }
         
-        if (willUnlock) {
-            gameState.upgrades[index + 1].unlocked = true;
+        if (visibilityChanged) {
             needsRender = true;
         }
         
@@ -1334,7 +1406,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const cost = getGeneralUpgradeCost();
             const canAfford = gameState.freeMode || gameState.kirks >= cost;
             const currentMult = getGeneralMultiplier();
-            const nextMult = Math.pow(1.3, gameState.generalLevel + 1);
+            const nextMult = Math.pow(GENERAL_MULTIPLIER_PER_LEVEL, gameState.generalLevel + 1);
             
             const generalEl = document.createElement('div');
             generalEl.className = 'upgrade-item-special';
@@ -1344,7 +1416,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <span class="upgrade-special-level">Level ${gameState.generalLevel} → ${gameState.generalLevel + 1}</span>
                 </div>
                 <p class="upgrade-special-desc">
-                    Multiply ALL production and click power by 1.3x<br>
+                    Multiply all production and click power by ${GENERAL_MULTIPLIER_PER_LEVEL.toFixed(2)}x<br>
                     <small>Current: ${currentMult.toFixed(2)}x → Next: ${nextMult.toFixed(2)}x</small>
                 </p>
                 <button class="btn upgrade-btn-special ${canAfford ? '' : 'disabled'}" 
@@ -1404,8 +1476,8 @@ document.addEventListener("DOMContentLoaded", () => {
             availableTiers.forEach(tierUpgrade => {
                 const canAfford = gameState.freeMode || gameState.kirks >= tierUpgrade.cost;
                 const currentTier = gameState.clickerTierById[tierUpgrade.id] || 0;
-                const currentMult = Math.pow(2, currentTier);
-                const nextMult = Math.pow(2, tierUpgrade.tier);
+                const currentMult = Math.pow(CLICKER_TIER_MULTIPLIER, currentTier);
+                const nextMult = Math.pow(CLICKER_TIER_MULTIPLIER, tierUpgrade.tier);
                 
                 const tierEl = document.createElement('div');
                 tierEl.className = 'upgrade-item-special upgrade-item-tier';
@@ -1415,8 +1487,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         <span class="upgrade-special-level">Tier ${currentTier} → ${tierUpgrade.tier}</span>
                     </div>
                     <p class="upgrade-special-desc">
-                        Double this clicker's production<br>
-                        <small>Multiplier: ${currentMult}x → ${nextMult}x</small><br>
+                        Boost this clicker's production<br>
+                        <small>Multiplier: ${currentMult.toFixed(2)}x → ${nextMult.toFixed(2)}x</small><br>
                         <small class="upgrade-progress">Unlocked at ${tierUpgrade.requiredOwned} owned (✓)</small>
                     </p>
                     <button class="btn upgrade-btn-special ${canAfford ? '' : 'disabled'}" 
